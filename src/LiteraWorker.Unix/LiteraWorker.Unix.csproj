@@ -8,8 +8,6 @@
     <Nullable>enable</Nullable>
     <InstallService>true</InstallService>
     <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
-    <PublishAot>true</PublishAot>
-    <SelfContained>true</SelfContained>  
   </PropertyGroup>
 
   <ItemGroup>

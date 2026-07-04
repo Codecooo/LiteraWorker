@@ -17,11 +17,7 @@ Summary:        A remote print CLI utility to print documents to any printer fro
 # Must be a valid SPDX expression covering the app AND bundled NuGet deps
 License:        GPL-3.0
 URL:            https://github.com/Codecooo/LiteraWorker
-Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
-# Vendored NuGet dependencies for offline build (Koji has no network).
-# Regenerate with something like:
-dotnet restore --packages ./nuget-deps && tar cJf %%{name}-%%{version}-nuget-deps.tar.xz -C nuget-deps .
-Source1:        %{name}-%{version}-nuget-deps.tar.xz
+Source0:        %{name}-%{version}.tar.gz
  
 # %%{dotnet_arches} is provided by the Fedora dotnet packages
 # (currently x86_64 aarch64 ppc64le s390x); .NET is not built elsewhere
@@ -41,43 +37,30 @@ Requires:       dotnet-runtime-%{dotnet_version}
 A remote print CLI utility to print documents to any printer from the command line.
  
 %prep
-%autosetup -p1 -n %{name}-%{version}
-# Lay out the vendored NuGet packages as a local restore source
-mkdir -p nuget-sources
-tar -C nuget-sources -xf %{SOURCE1}
-# Ensure restore can only see the vendored source, never nuget.org
-cat > nuget.config <<'EOF'
-<?xml version="1.0" encoding="utf-8"?>
-<configuration>
-  <packageSources>
-    <clear />
-    <add key="local" value="./nuget-sources" />
-  </packageSources>
-</configuration>
-EOF
+%autosetup -n %{name}-%{version}
  
 %build
 # Fedora's SDK ships with telemetry disabled, but be explicit
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
- 
-dotnet restore src/%{upstream_name}/%{upstream_name}.csproj
- 
+
+pwd
+find . -maxdepth 3
+
 # Framework-dependent (NOT self-contained, NOT single-file): the app
 # must run on the distro runtime so it picks up security updates
 dotnet publish \
-    --no-restore \
     --configuration Release \
     --no-self-contained \
     -p:VersionPrefix=%{version} \
     --output publish-cli \
-    src/%{upstream_name}/%{upstream_name}.csproj
+    ../%{upstream_name}.csproj
 
 dotnet publish \
     --configuration Release \
     --no-restore \
     --no-self-contained \
     -o publish-worker \
-    src/%{worker_name}/%{worker_name}.csproj
+    ../../%{worker_name}/%{worker_name}.csproj
  
 %install
 # Arch-specific payload (apphost launcher) => %%{_libdir}, not %%{_datadir}

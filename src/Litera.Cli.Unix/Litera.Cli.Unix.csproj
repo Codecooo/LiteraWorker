@@ -6,8 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
-    <PublishAot>true</PublishAot>
-    <SelfContained>true</SelfContained>
   </PropertyGroup>
 
   <ItemGroup>
