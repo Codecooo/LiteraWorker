@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>litera-worker</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <InstallService>true</InstallService>
+    <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+    <PublishAot>true</PublishAot>
+    <SelfContained>true</SelfContained>  
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LiteraWorker.Core\LiteraWorker.Core.csproj"/>
+    <PackageReference Include="SharpCUPS" Version="0.10.1" />
+    <Content Include="litera-worker.service" CopyToPublishDirectory="PreserveNewest" LinuxFileMode="1755">
+        <LinuxPath>/etc/systemd/system/litera-worker.service</LinuxPath>
+    </Content>
+  </ItemGroup>
+
+</Project>
