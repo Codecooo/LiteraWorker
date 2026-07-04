@@ -13,9 +13,6 @@
   <ItemGroup>
     <ProjectReference Include="..\LiteraWorker.Core\LiteraWorker.Core.csproj"/>
     <PackageReference Include="SharpCUPS" Version="0.10.1" />
-    <Content Include="litera-worker.service" CopyToPublishDirectory="PreserveNewest" LinuxFileMode="1755">
-        <LinuxPath>/etc/systemd/system/litera-worker.service</LinuxPath>
-    </Content>
   </ItemGroup>
 
 </Project>

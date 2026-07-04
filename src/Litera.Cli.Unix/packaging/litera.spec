@@ -43,9 +43,6 @@ A remote print CLI utility to print documents to any printer from the command li
 # Fedora's SDK ships with telemetry disabled, but be explicit
 export DOTNET_CLI_TELEMETRY_OPTOUT=1
 
-pwd
-find . -maxdepth 3
-
 # Framework-dependent (NOT self-contained, NOT single-file): the app
 # must run on the distro runtime so it picks up security updates
 dotnet publish \
@@ -53,20 +50,21 @@ dotnet publish \
     --no-self-contained \
     -p:VersionPrefix=%{version} \
     --output publish-cli \
-    ../%{upstream_name}.csproj
+    src/%{upstream_name}/%{upstream_name}.csproj
 
 dotnet publish \
     --configuration Release \
     --no-restore \
     --no-self-contained \
-    -o publish-worker \
-    ../../%{worker_name}/%{worker_name}.csproj
+    --output publish-worker \
+    src/%{worker_name}/%{worker_name}.csproj
  
 %install
 # Arch-specific payload (apphost launcher) => %%{_libdir}, not %%{_datadir}
 install -d -m 0755 %{buildroot}%{_libdir}/%{name}
 cp -a publish-cli/* %{buildroot}%{_libdir}/%{name}/
-cp -a paper_sizes.json %{buildroot}%{_libdir}/%{name}/
+cp -a src/%{upstream_name}/packaging/paper_sizes.json \
+      %{buildroot}%{_libdir}/%{name}/
  
 # Entry point: symlink the native apphost into %%{_bindir}.
 # If upstream disables the apphost, install a 2-line wrapper script
@@ -78,8 +76,9 @@ install -d %{buildroot}%{_bindir}
 ln -s %{_libdir}/%{name}/Litera.Cli.Unix \
       %{buildroot}%{_bindir}/litera
 
-install -D -m0644 litera-worker.service \
-      %{buildroot}%{_unitdir}/litera-worker.service
+install -D -m0644 \
+    src/%{upstream_name}/packaging/litera-worker.service \
+    %{buildroot}%{_unitdir}/litera-worker.service
  
 # %check
 # dotnet test \

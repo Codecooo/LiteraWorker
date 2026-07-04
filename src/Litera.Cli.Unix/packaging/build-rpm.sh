@@ -11,10 +11,10 @@ rm -rf rpmbuild
 mkdir -p rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
 # Build a source tarball from the Git HEAD.
-git archive \
+git -C "$(git rev-parse --show-toplevel)" archive \
     --format=tar.gz \
-    --prefix=$name-$version/ \
-    -o rpmbuild/SOURCES/$name-$version.tar.gz \
+    --prefix="$name-$version/" \
+    -o src/Litera.Cli.Unix/packaging/rpmbuild/SOURCES/"$name-$version".tar.gz \
     HEAD
 
 cp $name.spec rpmbuild/SPECS/
