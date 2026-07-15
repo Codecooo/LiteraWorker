@@ -1,6 +1,8 @@
+using System.Net.Sockets;
+
 namespace LiteraWorker.Core.RpcServer;
 
 public interface IRpcTransport
 {
-    Task<Stream> AcceptAsync(CancellationToken cancellationToken);
+    Task<Socket> AcceptAsync(CancellationToken cancellationToken);
 }

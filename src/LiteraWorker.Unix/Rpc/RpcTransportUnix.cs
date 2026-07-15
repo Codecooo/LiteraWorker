@@ -5,7 +5,7 @@ namespace LiteraWorker.Unix.Rpc;
 
 public class RpcTransportUnix : IRpcTransport
 {
-    public async Task<Stream> AcceptAsync(CancellationToken cancellationToken)
+    public async Task<Socket> AcceptAsync(CancellationToken cancellationToken)
     {
         const string SocketPath = "/run/litera-worker.sock";
 
@@ -15,10 +15,20 @@ public class RpcTransportUnix : IRpcTransport
         var listener = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
 
         listener.Bind(new UnixDomainSocketEndPoint(SocketPath));
+
+#pragma warning disable CA1416 // Validate platform compatibility
+        File.SetUnixFileMode(
+            "/run/litera-worker.sock",
+            UnixFileMode.UserRead |
+            UnixFileMode.UserWrite |
+            UnixFileMode.GroupRead |
+            UnixFileMode.GroupWrite |
+            UnixFileMode.OtherRead |
+            UnixFileMode.OtherWrite);
+#pragma warning restore CA1416 // Validate platform compatibility
+
         listener.Listen();
 
-        var socket = await listener.AcceptAsync(cancellationToken);
-
-        return new NetworkStream(socket, ownsSocket: true);
+        return await listener.AcceptAsync(cancellationToken);
     }
 }

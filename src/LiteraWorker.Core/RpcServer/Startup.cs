@@ -1,17 +1,39 @@
+using System.Net.Sockets;
 using LiteraWorker.Core.Services.Auth;
 using LiteraWorker.Core.Services.Caching;
 using LiteraWorker.Core.Services.Printing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using StreamJsonRpc;
 
 namespace LiteraWorker.Core.RpcServer;
 
-public class Startup()
+public class Startup(ILogger<Startup> logger)
 {
-    public static async Task RegisterRpcServer(IServiceProvider sp)
+    public async Task RegisterRpcServer(IServiceProvider sp, CancellationToken ct = default)
     {
-        var stream = await sp.GetRequiredService<IRpcTransport>().AcceptAsync(CancellationToken.None);
-        var jsonRpc = JsonRpc.Attach(stream);
+        var transport = sp.GetRequiredService<IRpcTransport>();
+        while (!ct.IsCancellationRequested)
+        {
+            var socket = await transport.AcceptAsync(ct);
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await HandleConnection(socket, sp);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, "Error occurred while handling RPC connection");
+                }
+            }, CancellationToken.None);
+        }
+    }
+
+    public static async Task HandleConnection(Socket socket, IServiceProvider sp)
+    {
+        using var stream = new NetworkStream(socket, ownsSocket: true);
+        using var jsonRpc = new JsonRpc(stream);
 
         var printOps = sp.GetRequiredService<IPrintOps>();
         var printerCache = sp.GetRequiredService<IPrinterCache>();
@@ -24,5 +46,8 @@ public class Startup()
         jsonRpc.AddLocalRpcTarget(deviceCache);
         jsonRpc.AddLocalRpcTarget(userCache);
         jsonRpc.AddLocalRpcTarget(auth);
+
+        jsonRpc.StartListening();
+        await jsonRpc.Completion;
     }
 }
