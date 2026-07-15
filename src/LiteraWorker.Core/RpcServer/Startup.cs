@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using LiteraWorker.Core.Services.Auth;
 using LiteraWorker.Core.Services.Caching;
 using LiteraWorker.Core.Services.Printing;
@@ -11,8 +10,8 @@ public class Startup()
 {
     public static async Task RegisterRpcServer(IServiceProvider sp)
     {
-        var process = Process.GetCurrentProcess();
-        var jsonRpc = JsonRpc.Attach(process.StandardInput.BaseStream, process.StandardOutput);
+        var stream = await sp.GetRequiredService<IRpcTransport>().AcceptAsync(CancellationToken.None);
+        var jsonRpc = JsonRpc.Attach(stream);
 
         var printOps = sp.GetRequiredService<IPrintOps>();
         var printerCache = sp.GetRequiredService<IPrinterCache>();

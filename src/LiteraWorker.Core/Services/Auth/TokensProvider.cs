@@ -13,9 +13,7 @@ public class TokensProvider(IHttpClientFactory httpClientFactory, IPersistentIde
         using var client = httpClientFactory.CreateClient("AuthClient");
         var user = await identity.LoadIdentity(cancellationToken) ?? throw new IdentityNotFoundException();
 
-        var tokenRequest = new TokenRequestDto(user.UserId, refreshToken);
-
-        var result = await client.PostAsJsonAsync("api/auth/refresh-tokens", tokenRequest, JsonContext.Default.TokenRequestDto, cancellationToken);
+        var result = await client.PostAsJsonAsync("api/auth/refresh-tokens", refreshToken, cancellationToken);
 
         if (!result.IsSuccessStatusCode)
         {

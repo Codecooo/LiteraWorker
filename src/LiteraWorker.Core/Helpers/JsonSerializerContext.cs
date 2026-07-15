@@ -44,7 +44,6 @@ namespace LiteraWorker.Core.Helpers;
 [JsonSerializable(typeof(LocalStoredCredential))]
 [JsonSerializable(typeof(LoginResponseDto))]
 [JsonSerializable(typeof(CreateDeviceDto))]
-[JsonSerializable(typeof(TokenRequestDto))]
 [JsonSerializable(typeof(Dictionary<string, Media>))]
 [JsonSerializable(typeof(Guid))]
 [JsonSerializable(typeof(bool))]
