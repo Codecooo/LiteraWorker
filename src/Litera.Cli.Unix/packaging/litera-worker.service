@@ -4,6 +4,7 @@ Description=Background service worker for litera to receive print request
 [Service]
 Type=simple
 ExecStart=/usr/lib64/litera/worker/litera-worker
+Environment=DOTNET_EnableDiagnostics=0
 
 [Install]
 WantedBy=multi-user.target
