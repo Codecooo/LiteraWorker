@@ -1,10 +1,13 @@
 using System.Collections.Immutable;
 using LiteraWorker.Core.Helpers;
 using LiteraWorker.Core.Models;
+using PolyType;
+using StreamJsonRpc;
 
 namespace LiteraWorker.Core.Services.Caching;
 
-public interface IDeviceCache
+[JsonRpcContract, GenerateShape(IncludeMethods = MethodShapeFlags.PublicInstance)]
+public partial interface IDeviceCache
 {
     ValueTask<Result<IImmutableList<Device>>> GetAvailableDevices(CancellationToken token);
     

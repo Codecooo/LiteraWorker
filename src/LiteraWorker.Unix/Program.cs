@@ -35,8 +35,6 @@ var host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<IPrinterCache, PrinterCache>();
         services.AddSingleton<PrintClient>();
         services.AddHostedService<PrintClientWorker>();
-        services.AddSingleton<RpcServerCore>();
-        services.AddSingleton<Startup>();
     })
     .ConfigureHostOptions(options =>
     {
@@ -44,7 +42,6 @@ var host = Host.CreateDefaultBuilder(args)
     })
     .Build();
 
-var startup = host.Services.GetRequiredService<Startup>();
-_ =  startup.RegisterRpcServer();
+await Startup.RegisterRpcServer(host.Services);
 
 await host.RunAsync();

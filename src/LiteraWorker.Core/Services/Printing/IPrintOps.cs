@@ -1,9 +1,12 @@
 using System.Collections.Immutable;
 using LiteraWorker.Core.Models;
+using PolyType;
+using StreamJsonRpc;
 
 namespace LiteraWorker.Core.Services.Printing;
 
-public interface IPrintOps
+[JsonRpcContract, GenerateShape(IncludeMethods = MethodShapeFlags.PublicInstance)]
+public partial interface IPrintOps
 {
     /// <summary>
     /// Get printers information regarding configuration support, name, and URI 

@@ -7,7 +7,7 @@
  
 # Upstream project/assembly name (differs from RPM %%{name} casing)
 %global upstream_name Litera.Cli.Unix
-%global worker_name Litera.Worker.Unix
+%global worker_name LiteraWorker.Unix
  
 Name:           litera
 Version:        1.0.0
@@ -24,6 +24,7 @@ Source0:        %{name}-%{version}.tar.gz
 ExclusiveArch:  %{dotnet_arches}
  
 BuildRequires:  dotnet-sdk-%{dotnet_version}
+BuildRequires:  systemd-rpm-macros
  
 # Framework-dependent deployment: the system runtime executes the app
 Requires:       dotnet-runtime-%{dotnet_version}
@@ -73,8 +74,9 @@ mkdir -p %{buildroot}%{_libdir}/%{name}/worker
 cp -a publish-worker/* %{buildroot}%{_libdir}/%{name}/worker/
 
 install -d %{buildroot}%{_bindir}
-ln -s %{_libdir}/%{name}/Litera.Cli.Unix \
-      %{buildroot}%{_bindir}/litera
+ln -sr \
+    %{buildroot}%{_libdir}/%{name}/Litera.Cli.Unix \
+    %{buildroot}%{_bindir}/litera
 
 install -D -m0644 \
     src/%{upstream_name}/packaging/litera-worker.service \
@@ -91,6 +93,16 @@ install -D -m0644 \
 %doc README.md
 %{_bindir}/%{name}
 %{_libdir}/%{name}/
- 
+%{_unitdir}/litera-worker.service
+
+%post
+%systemd_post litera-worker.service
+
+%preun
+%systemd_preun litera-worker.service
+
+%postun
+%systemd_postun_with_restart litera-worker.service
+
 %changelog
 %autochangelog

@@ -3,7 +3,7 @@ Description=Background service worker for litera to receive print request
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/litera-worker
+ExecStart=/usr/lib64/litera/worker/litera-worker
 
 [Install]
 WantedBy=multi-user.target

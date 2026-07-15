@@ -1,20 +1,12 @@
-﻿using Litera.Cli.Core.Commands;
+﻿using System.Net.Sockets;
+using Litera.Cli.Core.Commands;
+using Litera.Cli.Core.Rpc;
 using Litera.Cli.Unix.Commands;
-using LiteraWorker.Core.Networks.SignalRClient;
-using LiteraWorker.Core.Services;
-using LiteraWorker.Core.Services.Caching;
-using LiteraWorker.Core.Services.Printing;
-using LiteraWorker.Unix.Sevices.Printing;
 using Microsoft.Extensions.DependencyInjection;
 using XenoAtom.CommandLine;
 
 var services = new ServiceCollection();
-services.AddCoreServices();
-services.AddSingleton<IJobsHandler, JobsHandlerUnix>();
-services.AddSingleton<IPrintOps, PrintOpsUnix>();
-services.AddSingleton<IPrinterCache, PrinterCache>();
-services.AddSingleton<PrintClient>();
-services.AddHostedService<PrintClientWorker>();
+services.AddRpcClient(await ConnectAsync());
 services.AddSingleton<StatusCommand>();
 services.AddSingleton<DiscoverCommand>();
 services.AddSingleton<LoginCommand, LoginCommandUnix>();
@@ -37,3 +29,16 @@ var app = new CommandApp("litera")
 };
 
 await app.RunAsync(args);
+
+/// <summary>
+/// Connects to the RPC server on systemd service socket
+/// </summary>
+/// <returns></returns>
+static async Task<Stream> ConnectAsync()
+{
+    var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
+    await socket.ConnectAsync(new UnixDomainSocketEndPoint("/run/litera-worker.sock"));
+
+    var stream = new NetworkStream(socket, ownsSocket: true);
+    return stream;
+}

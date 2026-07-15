@@ -8,7 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Codecooo.FlutterSharpRpc" Version="0.1.5" />
     <PackageReference Include="KeySharp" Version="1.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2" />
@@ -17,6 +16,7 @@
     <PackageReference Include="sameerIOTApps.Plugin.SecureStorage" Version="2.5.0" />
     <PackageReference Include="Serilog.Extensions.Logging.File" Version="9.0.0-dev-02303" />
     <PackageReference Include="SharpCUPS" Version="0.10.1" />
+    <PackageReference Include="StreamJsonRpc" Version="2.25.29" />
   </ItemGroup>
 
 </Project>

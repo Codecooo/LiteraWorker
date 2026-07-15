@@ -1,13 +1,17 @@
 using LiteraWorker.Core.DTO;
 using LiteraWorker.Core.Helpers;
 using LiteraWorker.Core.Services.ApiService;
+using PolyType;
+using StreamJsonRpc;
 
 namespace LiteraWorker.Core.Services.Auth;
 
 /// <summary>
 /// Interface for auth provider to handle authentication in the client side
 /// </summary>
-public interface IAuthProvider
+
+[JsonRpcContract, GenerateShape(IncludeMethods = MethodShapeFlags.PublicInstance)]
+public partial interface IAuthProvider
 {
     /// <summary>
     /// Register user to the API

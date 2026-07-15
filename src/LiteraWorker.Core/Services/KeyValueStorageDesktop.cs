@@ -2,7 +2,6 @@
 #if WINDOWS || MACOS || LINUX
 
 using System.Text.Json;
-using FlutterSharpRpc.Services;
 using KeySharp;
 using LiteraWorker.Core.Helpers;
 using Microsoft.Extensions.Logging;

@@ -1,6 +1,5 @@
 using System.Collections.Immutable;
 using System.Runtime.InteropServices;
-using FlutterSharpRpc.Services;
 using LiteraWorker.Core.DTO;
 using LiteraWorker.Core.Helpers;
 using LiteraWorker.Core.Mappers;
@@ -46,7 +45,6 @@ public class DeviceService(
             return Result<Device>.Failure(result.Message ?? "Failed to register device", result.StatusCode); 
         }
 
-        RpcLog.Info($"Registered new device with id {result.Value!.Id} for user {userId}");
         await persistentIdentity.SaveIdentity(userId, result.Value!.Id, token);
         return Result<Device>.Success(result.Value!.ToDevice());
     }

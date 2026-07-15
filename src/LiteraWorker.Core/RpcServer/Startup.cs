@@ -1,32 +1,29 @@
-using FlutterSharpRpc;
-using LiteraWorker.Core.Helpers;
+using System.Diagnostics;
+using LiteraWorker.Core.Services.Auth;
+using LiteraWorker.Core.Services.Caching;
+using LiteraWorker.Core.Services.Printing;
+using Microsoft.Extensions.DependencyInjection;
+using StreamJsonRpc;
 
 namespace LiteraWorker.Core.RpcServer;
 
-public class Startup(RpcServerCore core)
+public class Startup()
 {
-    public async Task RegisterRpcServer()
+    public static async Task RegisterRpcServer(IServiceProvider sp)
     {
-        await CsharpRpcServer.StartWithExplicitAsync(core, JsonContext.Default,
-        async (rpc, server) =>
-        {
-            rpc.AddLocalRpcMethod("SendPrintRequest", server.SendPrintRequest);
-            rpc.AddLocalRpcMethod("SendCancelPrintRequest", server.SendCancelPrintRequest);
-            rpc.AddLocalRpcMethod("FetchPrinters", server.FetchPrinters);
-            rpc.AddLocalRpcMethod("UpdatePrinter", server.UpdatePrinter);
-            rpc.AddLocalRpcMethod("FetchDevices", server.FetchDevices);
-            rpc.AddLocalRpcMethod("FetchPrintJobsLocal", server.FetchPrintJobsLocal);
-            rpc.AddLocalRpcMethod("FetchPrintJobsRemote", server.FetchPrintJobsRemote);
-            rpc.AddLocalRpcMethod("FetchUser", server.FetchUser);
-            rpc.AddLocalRpcMethod("FetchCurrentDevice", server.FetchCurrentDevice);
-            rpc.AddLocalRpcMethod("LoginUser", server.LoginUser);
-            rpc.AddLocalRpcMethod("LogoutUser", server.LogoutUser);
-            rpc.AddLocalRpcMethod("RegisterUser", server.RegisterUser);
-            rpc.AddLocalRpcMethod("IsAuthenticated", server.IsAuthenticated);
-            rpc.AddLocalRpcMethod("IsUserSaved", server.IsUserSaved);
-            rpc.AddLocalRpcMethod("SaveUser", server.SaveUser);
-            rpc.AddLocalRpcMethod("DeleteDevice", server.DeleteDevice);
-            rpc.AddLocalRpcMethod("DeletePrinter", server.DeletePrinter);
-        });
+        var process = Process.GetCurrentProcess();
+        var jsonRpc = JsonRpc.Attach(process.StandardInput.BaseStream, process.StandardOutput);
+
+        var printOps = sp.GetRequiredService<IPrintOps>();
+        var printerCache = sp.GetRequiredService<IPrinterCache>();
+        var deviceCache = sp.GetRequiredService<IDeviceCache>();
+        var userCache = sp.GetRequiredService<IUserCache>();
+        var auth = sp.GetRequiredService<IAuthProvider>();
+
+        jsonRpc.AddLocalRpcTarget(printOps);
+        jsonRpc.AddLocalRpcTarget(printerCache);
+        jsonRpc.AddLocalRpcTarget(deviceCache);
+        jsonRpc.AddLocalRpcTarget(userCache);
+        jsonRpc.AddLocalRpcTarget(auth);
     }
 }
