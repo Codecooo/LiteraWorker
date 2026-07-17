@@ -5,11 +5,11 @@ namespace LiteraWorker.Core.Services.Auth;
 
 public class TokenCache(IKeyValueStorage keyValueStorage, ITokensProvider tokensProvider) : ITokenCache
 {
-    private readonly string _key = "litera-auth-tokens";
+    private readonly string _filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "LiteraWorker", "auth_tokens.json");
 
     public async ValueTask ClearAsync(CancellationToken cancellationToken)
     {
-        await keyValueStorage.ClearAsync(_key, cancellationToken);
+        await keyValueStorage.ClearAsync(_filePath, cancellationToken);
     }
 
     public async ValueTask<string> GetAccessTokenAsync(CancellationToken cancellationToken)
@@ -19,7 +19,7 @@ public class TokenCache(IKeyValueStorage keyValueStorage, ITokensProvider tokens
         if (JwtDecoder.IsAccessTokenExpired(tokens.AccessToken))
         {
             var newTokens = await tokensProvider.RefreshTokens(tokens.RefreshToken, cancellationToken);
-            await keyValueStorage.SetAsync(_key, newTokens, cancellationToken);
+            await keyValueStorage.SetAsync(_filePath, newTokens, cancellationToken);
             return newTokens.AccessToken;
         }
         
@@ -35,12 +35,12 @@ public class TokenCache(IKeyValueStorage keyValueStorage, ITokensProvider tokens
     public async ValueTask SaveAsync(AuthTokens tokens, CancellationToken cancellationToken)
     {
         
-        await keyValueStorage.SetAsync(_key, tokens, cancellationToken);
+        await keyValueStorage.SetAsync(_filePath, tokens, cancellationToken);
     }
 
     private async ValueTask<AuthTokens> GetTokensAsync(CancellationToken cancellationToken)
     {
-        var tokens = await keyValueStorage.GetAsync<AuthTokens>(_key, cancellationToken) ?? throw new IdentityNotFoundException();
+        var tokens = await keyValueStorage.GetAsync<AuthTokens>(_filePath, cancellationToken) ?? throw new IdentityNotFoundException();
         return tokens;
     }
 }

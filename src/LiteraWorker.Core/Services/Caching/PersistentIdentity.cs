@@ -4,7 +4,7 @@ namespace LiteraWorker.Core.Services.Caching;
 
 public sealed class PersistentIdentity(IKeyValueStorage storage) : IPersistentIdentity
 {
-    private const string Key = "litera-identity";
+    private readonly string _filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "LiteraWorker", "identity.json");
 
     private static readonly SemaphoreSlim _lock = new(1, 1);
 
@@ -26,13 +26,13 @@ public sealed class PersistentIdentity(IKeyValueStorage storage) : IPersistentId
                     ModifiedAt = DateTime.UtcNow,
                     Fingerprint = Guid.CreateVersion7()
                 };
-                await storage.SetAsync(Key, userIdentity, token);
+                await storage.SetAsync(_filePath, userIdentity, token);
 
                 return;
             }
 
             var newIdentity = identity with { UserId = userId == default ? identity.UserId : userId, DeviceId = deviceId == default ? identity.DeviceId : deviceId, ModifiedAt = DateTime.UtcNow };
-            await storage.SetAsync(Key, newIdentity, token);
+            await storage.SetAsync(_filePath, newIdentity, token);
         }
         finally
         {
@@ -41,8 +41,8 @@ public sealed class PersistentIdentity(IKeyValueStorage storage) : IPersistentId
     }
 
     public async ValueTask<Identity?> LoadIdentity(CancellationToken token) =>
-        await storage.GetAsync<Identity>(Key, token);
+        await storage.GetAsync<Identity>(_filePath, token);
 
     public async ValueTask ClearIdentity(CancellationToken token) =>
-        await storage.ClearAsync(Key, token);
+        await storage.ClearAsync(_filePath, token);
 }

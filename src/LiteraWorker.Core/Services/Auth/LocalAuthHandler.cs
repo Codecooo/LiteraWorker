@@ -5,7 +5,7 @@ namespace LiteraWorker.Core.Services.Auth;
 
 public class LocalAuthHandler(IKeyValueStorage keyValueStorage)
 {
-    private string _storageKey = "litera-local-auth";
+    private string _storageKey = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "LiteraWorker", "local_credentials.json");
 
     public async Task SaveUser(string password)
     {

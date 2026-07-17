@@ -2,7 +2,7 @@ namespace LiteraWorker.Core.Services;
 
 public interface IKeyValueStorage
 {
-    ValueTask ClearAsync(string key, CancellationToken ct);
-    ValueTask<TValue?> GetAsync<TValue>(string key, CancellationToken ct);
-    ValueTask SetAsync<TValue>(string key, TValue value, CancellationToken ct) where TValue : notnull;
+    ValueTask ClearAsync(string filePath, CancellationToken ct);
+    ValueTask<TValue?> GetAsync<TValue>(string filePath, CancellationToken ct);
+    ValueTask<TValue?> SetAsync<TValue>(string filePath, TValue value, CancellationToken ct) where TValue : notnull;
 }

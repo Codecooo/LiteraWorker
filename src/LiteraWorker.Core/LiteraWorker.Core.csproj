@@ -10,9 +10,10 @@
   <ItemGroup>
     <PackageReference Include="KeySharp" Version="1.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="10.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.10" />
     <PackageReference Include="sameerIOTApps.Plugin.SecureStorage" Version="2.5.0" />
     <PackageReference Include="Serilog.Extensions.Logging.File" Version="9.0.0-dev-02303" />
     <PackageReference Include="SharpCUPS" Version="0.10.1" />

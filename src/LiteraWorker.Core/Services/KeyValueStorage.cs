@@ -1,41 +1,34 @@
-#if ANDROID
-
 using System.Text.Json;
 using LiteraWorker.Core.Helpers;
-using Plugin.SecureStorage;
 
 namespace LiteraWorker.Core.Services;
 
-public class KeyValueStorageMobile : IKeyValueStorage
+public class KeyValueStorage : IKeyValueStorage
 {
-    public ValueTask ClearAsync(string key, CancellationToken ct)
+    public ValueTask ClearAsync(string filePath, CancellationToken ct)
     {
-        CrossSecureStorage.Current.DeleteKey(key);
+        File.Delete(filePath);
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask<TValue?> GetAsync<TValue>(string key, CancellationToken ct)
+    public ValueTask<TValue?> GetAsync<TValue>(string filePath, CancellationToken ct)
     {
-        var valueJson = CrossSecureStorage.Current.GetValue(key);
-
+        var value = FileSecurity.Decrypt(filePath);
 #pragma warning disable IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
 #pragma warning disable IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
-        
-        var value = JsonSerializer.Deserialize<TValue>(valueJson, JsonOptionsDefault.Options);
 
-        return ValueTask.FromResult(value);
+        var result = JsonSerializer.Deserialize<TValue>(value, JsonOptionsDefault.Options);
+
+        return ValueTask.FromResult(result)!;
     }
 
-    public ValueTask SetAsync<TValue>(string key, TValue value, CancellationToken ct) where TValue : notnull
+    public ValueTask<TValue?> SetAsync<TValue>(string filePath, TValue value, CancellationToken ct) where TValue : notnull
     {
-        var valueJson = JsonSerializer.Serialize(value, JsonOptionsDefault.Options);
-
-        CrossSecureStorage.Current.SetValue(key, valueJson);
-        return ValueTask.CompletedTask;
+        var stringValue = JsonSerializer.Serialize(value, JsonOptionsDefault.Options);
+        FileSecurity.Encrypt(filePath, stringValue);
+        return ValueTask.FromResult<TValue?>(default);
     }
 
 #pragma warning restore IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
 #pragma warning restore IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
 }
-
-#endif

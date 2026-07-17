@@ -16,14 +16,14 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddCoreServices(this IServiceCollection services)
     {
         var date = DateTime.UtcNow.ToString("yyy-MM-dd");
-        var logLocation = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "litera", "worker-logs", $"{date}-worker-logs.txt");
-
+        
         services.AddLogging((builder) =>
         {   
-            builder.AddFile(logLocation);
+            builder.AddFileLogging();
+            builder.AddConsole();
         });
 
-        services.AddSingleton<IKeyValueStorage, KeyValueStorageDesktop>();
+        services.AddSingleton<IKeyValueStorage, KeyValueStorage>();
         services.AddSingleton<IPersistentIdentity, PersistentIdentity>();
         services.AddSingleton<ITokensProvider, TokensProvider>();
         services.AddSingleton<ITokenCache, TokenCache>();
@@ -56,5 +56,19 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IPrinterCache, PrinterCache>();
 
         return services;
+    }
+
+    static IServiceCollection AddFileLogging(this ILoggingBuilder builder)
+    {
+        var date = DateTime.UtcNow.ToString("yyy-MM-dd");
+        var logLocation = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "litera", "worker-logs", $"{date}-worker-logs.txt");
+
+        if (OperatingSystem.IsLinux())
+        {
+            logLocation = Path.Combine("var", "log", "litera", "worker-logs", $"{date}-worker-logs.txt");
+        }
+
+        builder.AddFile(logLocation);
+        return builder.Services;
     }
 }
