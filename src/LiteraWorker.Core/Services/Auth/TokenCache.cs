@@ -5,7 +5,8 @@ namespace LiteraWorker.Core.Services.Auth;
 
 public class TokenCache(IKeyValueStorage keyValueStorage, ITokensProvider tokensProvider) : ITokenCache
 {
-    private readonly string _filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "LiteraWorker", "auth_tokens.json");
+    private readonly string _filePath = OperatingSystem.IsWindows() ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "LiteraWorker", "auth_tokens.json")
+        : "/var/lib/litera/auth_tokens.json";
 
     public async ValueTask ClearAsync(CancellationToken cancellationToken)
     {

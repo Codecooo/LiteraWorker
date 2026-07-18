@@ -4,7 +4,8 @@ namespace LiteraWorker.Core.Services.Caching;
 
 public sealed class PersistentIdentity(IKeyValueStorage storage) : IPersistentIdentity
 {
-    private readonly string _filePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "LiteraWorker", "identity.json");
+    private readonly string _filePath = OperatingSystem.IsWindows() ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "LiteraWorker", "identity.json")
+        : "/var/lib/litera/identity.json";
 
     private static readonly SemaphoreSlim _lock = new(1, 1);
 

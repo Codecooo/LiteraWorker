@@ -13,18 +13,14 @@ public static class LocalCacheSet
 
     private static SemaphoreSlim GetSemaphoreSlim(string path) => _locks.GetOrAdd(path, _ => new(1,1));
 
-    public static string InitializeCachePath(string filename)
+    public static string InitializeCachePath(string cacheDir)
     {
-        var folder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        var dir = Path.Combine(folder, "litera", "cache");
-        Directory.CreateDirectory(dir);
-        var path = Path.Combine(dir, filename);
-        if (!File.Exists(path))
+        if (!File.Exists(cacheDir))
         {
             // Create an empty file atomically
-            File.WriteAllText(path, string.Empty);
+            File.WriteAllText(cacheDir, string.Empty);
         }
-        return path;
+        return cacheDir;
     }
 
     public static async Task WriteCache<T>(T value, string path) 

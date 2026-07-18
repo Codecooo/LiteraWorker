@@ -65,7 +65,8 @@ public static class ServiceCollectionExtensions
 
         if (OperatingSystem.IsLinux())
         {
-            logLocation = Path.Combine("var", "log", "litera", "worker-logs", $"{date}-worker-logs.txt");
+            var logsDir = Environment.GetEnvironmentVariable("LOGS_DIRECTORY") ?? string.Empty;
+            logLocation = Path.Combine(logsDir, "worker-logs", $"{date}-logs.txt");
         }
 
         builder.AddFile(logLocation);

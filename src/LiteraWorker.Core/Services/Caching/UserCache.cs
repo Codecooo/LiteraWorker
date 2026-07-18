@@ -12,8 +12,9 @@ public sealed class UserCache(
     UserService userService,
     IPersistentIdentity persistentIdentity) : IUserCache
 {
-    private readonly string _currentUserCachePath = LocalCacheSet.InitializeCachePath("current-user.json");
-    private readonly string _allUserCachePath = LocalCacheSet.InitializeCachePath("users.json");
+    private readonly static string _cacheDir = Path.Combine(Environment.GetEnvironmentVariable("CACHE_DIRECTORY") ?? "");
+    private readonly string _currentUserCachePath = LocalCacheSet.InitializeCachePath(Path.Combine(_cacheDir, "current-user.json"));
+    private readonly string _allUserCachePath = LocalCacheSet.InitializeCachePath(Path.Combine(_cacheDir, "users.json"));
 
     public async ValueTask<Result<User>> GetCurrentUser(CancellationToken token)
     {

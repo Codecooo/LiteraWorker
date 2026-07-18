@@ -17,7 +17,8 @@ public sealed class PrinterCache(
     private readonly ILogger<PrinterCache> _logger = logger;
     private readonly PrinterService _printerService = printerService;
     private readonly IPrintOps _printOps = printOps;
-    private readonly string _cachePath = LocalCacheSet.InitializeCachePath("printers.json");
+    private readonly static string _cacheDir = Path.Combine(Environment.GetEnvironmentVariable("CACHE_DIRECTORY") ?? "");
+    private readonly string _cachePath = LocalCacheSet.InitializeCachePath(Path.Combine(_cacheDir, "printers.json"));
 
     public async ValueTask<Result<Printer>> GetPrinterDetails(Guid id, CancellationToken token)
     {

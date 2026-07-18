@@ -13,8 +13,9 @@ public sealed class DeviceCache(
     DeviceService deviceService,
     IPersistentIdentity persistentIdentity) : IDeviceCache
 {
-    private readonly string _allDevicesCachePath = LocalCacheSet.InitializeCachePath("devices.json");
-    private readonly string _currentDeviceCachePath = LocalCacheSet.InitializeCachePath("current-device.json");
+    private readonly static string _cacheDir = Path.Combine(Environment.GetEnvironmentVariable("CACHE_DIRECTORY") ?? "");
+    private readonly string _allDevicesCachePath = LocalCacheSet.InitializeCachePath(Path.Combine(_cacheDir, "devices.json"));
+    private readonly string _currentDeviceCachePath = LocalCacheSet.InitializeCachePath(Path.Combine(_cacheDir, "current-device.json"));
 
     public async ValueTask<Result<IImmutableList<Device>>> GetAvailableDevices(CancellationToken token)
     {
