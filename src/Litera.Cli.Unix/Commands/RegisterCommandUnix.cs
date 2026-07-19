@@ -24,7 +24,6 @@ public class RegisterCommandUnix(IAuthProvider authProvider) : RegisterCommand
         ctx.Out.Write("Enter your password: ");
         var password = PasswordInput.SecurePassword();
 
-        ctx.Out.WriteLine($"Logging in {email}...");
         var userDto = new UserDto
         {
             Name = username,
@@ -40,7 +39,8 @@ public class RegisterCommandUnix(IAuthProvider authProvider) : RegisterCommand
             if (!result.Successful)
             {
                 ctx.Out.WriteLine("Register failed");
-                ErrorHelpers.OutputError(ctx, result.Problem!.Detail!);
+                var error = result.Problem?.Detail;
+                ErrorHelpers.OutputError(ctx, error ?? "Some unexpected things happened");
                 return 1;
             }
         }

@@ -1,0 +1,12 @@
+policy_module(litera_worker, 1.0)
+
+type litera_worker_t;
+type litera_worker_exec_t;
+
+init_daemon_domain(litera_worker_t, litera_worker_exec_t)
+
+files_type(litera_worker_exec_t)
+
+allow litera_worker_t self:process { fork sigchld getsession };
+
+fs_getattr_cgroup(litera_worker_t)

@@ -25,7 +25,9 @@ ExclusiveArch:  %{dotnet_arches}
  
 BuildRequires:  dotnet-sdk-%{dotnet_version}
 BuildRequires:  systemd-rpm-macros
- 
+BuildRequires:  selinux-policy-devel
+BuildRequires:  make
+
 # Framework-dependent deployment: the system runtime executes the app
 Requires:       dotnet-runtime-%{dotnet_version}
  
@@ -59,6 +61,15 @@ dotnet publish \
     --no-self-contained \
     --output publish-worker \
     src/%{worker_name}/%{worker_name}.csproj
+
+# Build an SELinux policy module
+checkmodule -M -m -o \
+    src/%{upstream_name}/packaging/litera_worker.mod \
+    src/%{upstream_name}/packaging/selinux/litera_worker.te
+
+semodule_package -o \
+    src/%{upstream_name}/packaging/litera_worker.pp \
+    -m src/%{upstream_name}/packaging/litera_worker.mod
  
 %install
 # Arch-specific payload (apphost launcher) => %%{_libdir}, not %%{_datadir}
@@ -81,7 +92,13 @@ ln -sr \
 install -D -m0644 \
     src/%{upstream_name}/packaging/litera-worker.service \
     %{buildroot}%{_unitdir}/litera-worker.service
- 
+
+# install the compiled module into the package payload so the RPM can
+# install it at %post time. The build requires selinux-policy-devel.
+install -D -m0644 \
+    src/%{upstream_name}/packaging/litera_worker.pp \
+    %{buildroot}%{_datadir}/%{name}/selinux/litera_worker.pp
+
 # %check
 # dotnet test \
 #     --no-restore \
@@ -94,11 +111,20 @@ install -D -m0644 \
 %{_bindir}/%{name}
 %{_libdir}/%{name}/
 %{_unitdir}/litera-worker.service
+%{_datadir}/%{name}/selinux/
 
 %post
+# If selinux is enabled and a compiled module was packaged, load it now.
+if selinuxenabled; then
+    %{_sbindir}/semodule -i \
+        %{_datadir}/%{name}/selinux/litera_worker.pp || :
+fi
 %systemd_post litera-worker.service
 
 %preun
+if [ $1 -eq 0 ] && selinuxenabled; then
+    %{_sbindir}/semodule -r litera_worker || :
+fi
 %systemd_preun litera-worker.service
 
 %postun

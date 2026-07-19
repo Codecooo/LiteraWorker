@@ -13,10 +13,9 @@ public class KeyValueStorage : IKeyValueStorage
 
     public ValueTask<TValue?> GetAsync<TValue>(string filePath, CancellationToken ct)
     {
-        var value = FileSecurity.Decrypt(filePath);
-#pragma warning disable IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
-#pragma warning disable IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
+        if (!File.Exists(filePath)) return ValueTask.FromResult<TValue?>(default);
 
+        var value = FileSecurity.Decrypt(filePath);
         var result = JsonSerializer.Deserialize<TValue>(value, JsonOptionsDefault.Options);
 
         return ValueTask.FromResult(result)!;
@@ -28,7 +27,4 @@ public class KeyValueStorage : IKeyValueStorage
         FileSecurity.Encrypt(filePath, stringValue);
         return ValueTask.FromResult<TValue?>(default);
     }
-
-#pragma warning restore IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
-#pragma warning restore IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
 }

@@ -1,8 +1,10 @@
 [Unit]
 Description=Background service worker for litera to receive print request
+Wants=network-online.target
+After=network-online.target
 
 [Service]
-Type=simple
+Type=notify
 ExecStart=/usr/lib64/litera/worker/litera-worker
 Environment=DOTNET_EnableDiagnostics=0
 StateDirectory=litera

@@ -18,16 +18,13 @@ var host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<IPrinterCache, PrinterCache>();
         services.AddSingleton<IRpcTransport, RpcTransportUnix>();
         services.AddSingleton<PrintClient>();
-        services.AddSingleton<Startup>();
         services.AddHostedService<PrintClientWorker>();
+        services.AddHostedService<RpcServerWorker>();
     })
     .ConfigureHostOptions(options =>
     {
         options.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore;
     })
     .Build();
-
-var startup = host.Services.GetRequiredService<Startup>();
-await startup.RegisterRpcServer(host.Services);
 
 await host.RunAsync();

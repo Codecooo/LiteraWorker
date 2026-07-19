@@ -1,0 +1,1 @@
+/usr/lib/litera/worker/litera-worker    --    gen_context(system_u:object_r:litera_worker_exec_t,s0)

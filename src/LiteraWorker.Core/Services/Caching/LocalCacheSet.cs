@@ -15,10 +15,16 @@ public static class LocalCacheSet
 
     public static string InitializeCachePath(string cacheDir)
     {
+        Directory.CreateDirectory(Path.GetDirectoryName(cacheDir)!);
+
         if (!File.Exists(cacheDir))
         {
             // Create an empty file atomically
-            File.WriteAllText(cacheDir, string.Empty);
+            using var fs = new FileStream(
+                cacheDir,
+                FileMode.OpenOrCreate,
+                FileAccess.ReadWrite,
+                FileShare.None);
         }
         return cacheDir;
     }

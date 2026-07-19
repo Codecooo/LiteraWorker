@@ -25,11 +25,11 @@ public class LoginCommandUnix(IAuthProvider authProvider) : LoginCommand
         try
         {
             var result = await authProvider.Login(loginRequest);
-
             if (!result.Successful)
             {
                 ctx.Out.WriteLine("Login failed!");
-                ErrorHelpers.OutputError(ctx, result.Problem!.Detail!);
+                var error = result.Problem?.Detail;
+                ErrorHelpers.OutputError(ctx, error ?? "Unexpected error happened");
                 return 1;
             }
         }

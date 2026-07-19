@@ -3,14 +3,15 @@ using LiteraWorker.Core.Services.Auth;
 using LiteraWorker.Core.Services.Caching;
 using LiteraWorker.Core.Services.Printing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using StreamJsonRpc;
 
 namespace LiteraWorker.Core.RpcServer;
 
-public class Startup(ILogger<Startup> logger)
+public class RpcServerWorker(ILogger<RpcServerWorker> logger, IServiceProvider sp) : BackgroundService
 {
-    public async Task RegisterRpcServer(IServiceProvider sp, CancellationToken ct = default)
+    protected override async Task ExecuteAsync(CancellationToken ct)
     {
         var transport = sp.GetRequiredService<IRpcTransport>();
         while (!ct.IsCancellationRequested)
@@ -29,7 +30,7 @@ public class Startup(ILogger<Startup> logger)
             }, CancellationToken.None);
         }
     }
-
+    
     public static async Task HandleConnection(Socket socket, IServiceProvider sp)
     {
         using var stream = new NetworkStream(socket, ownsSocket: true);

@@ -4,13 +4,13 @@ namespace LiteraWorker.Core.Helpers;
 
 public readonly record struct Result<T>
 {
-    public bool Successful { get; }
-    public string Message { get; }
-    public T? Value { get; }
-    public int StatusCode { get; }
-    public ProblemDetails? Problem { get; }
+    public bool Successful { get; init; }
+    public string Message { get; init; }
+    public T? Value { get; init; }
+    public int StatusCode { get; init; }
+    public ProblemDetails? Problem { get; init; }
 
-    private Result(
+    public Result(
         T? value,
         bool success,
         string message,

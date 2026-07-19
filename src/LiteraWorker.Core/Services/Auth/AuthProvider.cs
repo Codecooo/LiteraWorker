@@ -38,7 +38,7 @@ public class AuthProvider(ITokenCache tokenCache, ITokensProvider tokensProvider
         {
             return Result<EmptyRecord>.Failure(result.Message, result.StatusCode, result.Problem);
         }
-
+        
         await tokenCache.SaveAsync(new AuthTokens(result.Value!.TokenResponse.AccessToken, result.Value!.TokenResponse.RefreshToken), cancellationToken);
         await authService.RegisterUserDevice(result.Value!.UserId, cancellationToken);
 
@@ -59,6 +59,7 @@ public class AuthProvider(ITokenCache tokenCache, ITokensProvider tokensProvider
 
     public async ValueTask<Result<EmptyRecord>> RegisterUser(UserDto userDto, CancellationToken cancellationToken = default)
     {
-        return await authService.RegisterUser(userDto, cancellationToken);
+        var result =  await authService.RegisterUser(userDto, cancellationToken);
+        return result;
     }
 }
